@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title> Iniciar sesión </title>
+        <script src="scripts/requests.js"></script>
+        <script src="scripts/validations.js"></script>
+        <script src="scripts/handlerEvents.js"></script>
+        <script src="scripts/errSys.js"></script>
+        <script src="scripts/wscalls.js"></script>
+        <script src="scripts/util.js"></script>
+				<script src="scripts/aes.js"></script>
+				<script src="scripts/encryption.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/delete_style.css">
+    </head>
+		<body>
+        <form name="login_form" id="delete_form" method="GET"> 
+            <div style="text-align:center;">
+                <img src="images/ipn2.png" width=150 height=150 id="delete_image_logoipn" alt="">
+                <br><br>
+                <table  style="margin: 0 auto;">
+                    <tr>
+                        <td colspan="2"><input type="text" placeholder="    Introduce usuario" name="delete_form_user" id="delete_form_user" class="delete_form_class"/></td>
+                        <td><div id="delete_form_user_errMsg"></div></td>                    
+                    </tr>
+                    <tr>
+                        <td colspan="2"><input type="password" placeholder="&#9919; Introduce contrase&ntilde;a"  name="delete_form_passwd" id="delete_form_passwd" class="delete_form_class"/></td>
+                        <td><div id="delete_form_passwd_errMsg"></div></td>                 
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align:right;">
+                            <input type="button" name="delete_form_submitlogin" id="delete_form_submitlogin" class="delete_form_form_submitlogin" value="Eliminar" 
+                                   onClick="var user_err_tag = 'delete_form_user_errMsg';
+                                           var user_value = document.getElementById('delete_form_user').value;
+                                           var passwd_err_tag = 'delete_form_passwd_errMsg';
+                                           var passwd_value = document.getElementById('delete_form_passwd').value;
+																					 var encryptPasswd = encryptAES(passwd_value);
+                                           var allOK = true;
+                                           clearDivFields(user_err_tag, passwd_err_tag);
+                                           /* 1. First make form validations */
+                                           if (validateNotNull(user_err_tag, user_value, passwd_err_tag, passwd_value)) {
+                                               resp = validateUserGenQR(user_value, encryptPasswd, 'delete');
+                                               if (resp == _SUCCESS) {
+                                                   msg = _REG_SEND_EMAIL_DELETE;
+                                                   allOK = true;
+                                               } else {
+                                                   respStr = '' + resp;
+                                                   msg = errSystemOwn[respStr];
+                                                   allOK = false;
+                                               }
+
+                                               alert(msg);
+                                               utils_show_message_in_div('delete_form_result', msg);
+                                               if (allOK == true) {
+                                                   alert(_WAITING_FOR_DELETE);
+                                                   waitForFinishOp(user_value, 'delete', '1', handlerEventAfter, 'wait_form_result', _OP_DELETE_SUCCESS, 'signin.html');
+                                                       utils_show_message_in_div('wait_form_result', _WAITING_FOR_DELETE);
+                                               }
+
+
+                                           }"/>
+                        </td>
+                    </tr> 
+                </table>
+            </div>
+        </form>
+        <div id="delete_form_result"><!-- Ajax response --></div>
+        <div id="wait_form_result"><!-- Ajax response --></div>
+    </body>
+</html>

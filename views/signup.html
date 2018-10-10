@@ -1,0 +1,115 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title> Registrarse </title>
+        <script src="scripts/requests.js"></script>
+        <script src="scripts/validations.js"></script>
+        <script src="scripts/handlerEvents.js"></script>
+        <script src="scripts/wscalls.js"></script>
+        <script src="scripts/errSys.js"></script>
+        <script src="scripts/util.js"></script>
+				<script src="scripts/aes.js"></script>
+				<script src="scripts/encryption.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/logup_style.css">
+    </head>
+    <body>
+        <form name="logup_form" id="logup_form" method="GET"> 
+            <div style="text-align:center;">      
+                <fieldset style="width:417px;height:235px; ">
+                    <legend><strong style="background-color:brown">Registrarse</strong></legend>
+                    <table  style="margin: 0 auto;">      
+                        <tr>
+                            <td colspan="2"><input type="text" placeholder="    Nombre" name="logup_form_name" id="logup_form_name" class="logup_form_class"/></td>
+                            <td><div id="logup_form_name_errMsg"></div></td> 
+                            <td colspan="2"><input type="text" placeholder="Apellidos"  name="logup_form_lastName" id="logup_form_lastName" class="logup_form_class"/></td>
+                            <td><div id="logup_form_lastName_errMsg"></div></td>                             
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="text" placeholder="    Introduce usuario" name="logup_form_user" id="logup_form_user" class="logup_form_class"/></td>
+                            <td><div id="logup_form_user_errMsg"></div></td>  
+                            <td colspan="2"><input type="email" placeholder="    Correo electr&#243;nico" name="logup_form_email" id="logup_form_email" class="logup_form_class"/></td>
+                            <td><div id="logup_form_email_errMsg"></div></td>  
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="password" placeholder="&#9919; Introduce contrase&ntilde;a"  name="logup_form_passwd" id="logup_form_passwd" class="logup_form_class"/></td>
+                            <td><div id="logup_form_passwd_errMsg"></div></td>    
+                            <td colspan="2"><input type="password" placeholder="&#9919; Confirma contrase&ntilde;a"  name="logup_form_passwd2" id="logup_form_passwd2" class="logup_form_class"/></td>
+                            <td><div id="logup_form_passwd2_errMsg"></div></td> 
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align:right;">
+                                <input type="button" name="logup_form_submitlogin" id="logup_form_submitlogin" class="logup_form_form_submitlogin" value="Registrarse" 
+                                       onClick="
+                                               var name_err_tag = 'logup_form_name_errMsg';
+                                               var name_value = document.getElementById('logup_form_name').value;
+
+                                               var lastName_err_tag = 'logup_form_lastName_errMsg';
+                                               var lastName_value = document.getElementById('logup_form_lastName').value;
+
+                                               var user_err_tag = 'logup_form_user_errMsg';
+                                               var user_value = document.getElementById('logup_form_user').value;
+
+                                               var email_err_tag = 'logup_form_email_errMsg';
+                                               var email_value = document.getElementById('logup_form_email').value;
+
+                                               var passwd_err_tag = 'logup_form_passwd_errMsg';
+                                               var passwd_value = document.getElementById('logup_form_passwd').value;
+																							 var encryptPasswd = encryptAES(passwd_value);
+
+                                               var passwd2_err_tag = 'logup_form_passwd2_errMsg';
+                                               var passwd2_value = document.getElementById('logup_form_passwd2').value;
+                                               var allOK = true;
+
+                                               clearDivFields(name_err_tag, lastName_err_tag, user_err_tag, email_err_tag, passwd_err_tag, passwd2_err_tag);
+                                               /* 1. First make form validations */
+
+                                               if (validateNotNull(name_err_tag, name_value, lastName_err_tag, lastName_value, user_err_tag,
+                                                       user_value, email_err_tag, email_value, passwd_err_tag, passwd_value, passwd2_err_tag, passwd2_value)) {
+                                                   if (validateEmail(email_value)) {
+                                                       if (validatePassword(passwd_value) && validatePassword(passwd2_value)) {
+                                                           if (validateEqualPasswords(passwd_value, passwd2_value)) {
+                                                               resp = registerUserWS(user_value, name_value, encryptPasswd, lastName_value, email_value, 'add');
+                                                               if (resp == 0) {
+                                                                   msg = _REG_SEND_EMAIL_REGISTER;
+                                                                   allOK = true;
+																															  } else {
+																																  respStr = '' + resp;
+																																	msg = errSystemOwn[respStr];
+																																	allOK = false;
+																															  }
+                                                           } else {
+                                                               respStr = '' + resp;
+                                                               msg = errSystemOwn[respStr];
+                                                               allOK = false;
+                                                           }
+                                                           alert(msg);
+                                                           utils_show_message_in_div('logup_form_result', msg);
+                                                           if (allOK == true) {
+                                                               resp2 = saveOwncloudData(email_value, user_value, name_value, lastName_value, encryptPasswd);
+                                                               if (resp2 == 0) {
+																																	alert(_WAITING_FOR_REGISTER);
+                                                                  waitForFinishOp(user_value, 'add', '1', handlerEventAfter, 'wait_form_result', _OP_ADD_SUCCESS, 'signin.html');
+                                                                  utils_show_message_in_div('wait_form_result', _WAITING_FOR_REGISTER);
+                                                               } else {
+                                                                   respStr2 = '' + resp2;
+                                                                   msg2 = errSystemOwn[respStr2];
+																																	 alert(msg2);
+                                                                   allOK = false;
+                                                               }
+                                                           }
+
+                                                       }
+                                                   }
+
+                                               }"/>
+                            </td>
+                        </tr>
+
+                    </table>
+                </fieldset>
+            </div>
+        </form>
+        <div id="logup_form_result"><!-- Ajax response --></div>
+        <div id="wait_form_result"><!-- Ajax response --></div>
+    </body>
+</html>

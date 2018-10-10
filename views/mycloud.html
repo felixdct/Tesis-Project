@@ -1,0 +1,23 @@
+<html>
+	<head>
+		<title>Bienvenido!!!</title>
+		<script src="scripts/requests.js"></script>
+		<script src="scripts/validations.js"></script>
+		<script src="scripts/wscalls.js"></script>
+		<script src="scripts/errSys.js"></script>
+		<script src="scripts/util.js"></script>
+		<script src="scripts/handlerEvents.js"></script>
+		<script src="scripts/aes.js"></script>
+		<script src="scripts/encryption.js"></script>
+
+	<head>
+	<body onload='url_string=window.location.href; 
+			var url = new URL(url_string); 
+			var nickName = url.searchParams.get("nickname"); 
+			var passwd = url.searchParams.get("passwd");
+			var token  = url.searchParams.get("token");
+
+			loginInOwncloud(nickName, passwd, token);
+		'>
+	</body>
+</html>

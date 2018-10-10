@@ -1,0 +1,31 @@
+#Turn rewrite engine on
+Options +FollowSymlinks
+RewriteEngine on
+
+#map neat URL to internal URL
+RewriteRule ^$                             views/signin.html
+RewriteRule ^signin.html$                  views/signin.html
+RewriteRule ^signup.html$                  views/signup.html
+RewriteRule ^deleteusers.html$             views/deleteusers.html
+RewriteRule ^resetpasswd.html              views/resetpasswd.html
+RewriteRule ^genQR.html(.*)$               views/genQR.html
+RewriteRule ^test.php$                     views/test.php
+RewriteRule ^mycloud.html$                 views/mycloud.html
+
+#map webservice to internal URL
+RewriteRule ^controller.php(.*)$           controllers/RestController.php
+
+
+#map images URL to internal images files
+RewriteRule ^images/(.*)$                  resources/images/$1
+
+#map QR images URL to internal QR image files
+RewriteRule ^imagesqr/(.*)$                resources/tempqr/$1
+
+#map javascript URLs to internal javascript files
+RewriteRule ^scripts/(.*)$                 resources/js/$1
+
+
+#map css URLs to internal css files
+RewriteRule ^css/(.*)$                     resources/css/$1
+

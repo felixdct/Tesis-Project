@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<title>Confirmando usuario ...</title>
+		<script src="scripts/requests.js"></script>
+		<script src="scripts/errSys.js"></script>
+		<script src="scripts/wscalls.js"></script>
+		<script src="scripts/util.js"></script>
+		<script src="scripts/aes.js"></script>
+		<script src="scripts/encryption.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/qr_style.css"> 
+	</head>
+	<body onload='url_string=window.location.href; 
+			var url = new URL(url_string); 
+			var nickName = url.searchParams.get("nickname"); 
+			var op = url.searchParams.get("op");
+			var newPasswd = url.searchParams.get("newpasswd");
+			var token = url.searchParams.get("token");
+			
+
+			resp = genQRWS(nickName, newPasswd, op, token);
+			if (isNaN(resp["errCode"])) {
+				utils_show_image_in_div(resp["errCode"], 300, 300, "QR image", "QRimage");
+			}else {
+				var respStr = ""+resp["errCode"];
+				msg = errSystemOwn[respStr];
+				alert(msg);
+				utils_show_message_in_div("QRimage", msg);
+			}
+			'>
+		<div name='QRimage' id='QRimage'></div>
+	</body>
+</html>

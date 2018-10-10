@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title> Resetear contrase&ntilde;a </title>
+        <script src="scripts/requests.js"></script>
+        <script src="scripts/validations.js"></script>
+        <script src="scripts/handlerEvents.js"></script>
+        <script src="scripts/errSys.js"></script>
+        <script src="scripts/wscalls.js"></script>
+        <script src="scripts/util.js"></script>
+				<script src="scripts/aes.js"></script>
+				<script src="scripts/encryption.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/resetpw_style.css">
+    </head>
+    <body>
+        <br><br><br><br><br>
+        <form name="resetpw_form" id="resetpw_form" method="GET"> 
+            <br><br><br><br><br>
+            <div style="text-align:center;">
+                <fieldset style="width:250px;height:237px; background-color: brown">
+                    <legend><strong>Recuperar contrase&ntilde;a</strong></legend>   
+                    <table  style="margin: 0 auto;">
+                        <tr>
+                            <td colspan="2"><input type="text" placeholder="    Introduce usuario" name="resetpw_form_user" id="resetpw_form_user" class="resetpw_form_class"/></td>
+                            <td><div id="resetpw_form_user_errMsg"></div></td>                    
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="password" placeholder="&#9919; Nueva contrase&ntilde;a"  name="resetpw_form_passwd" id="resetpw_form_passwd" class="resetpw_form_class"/></td>
+                            <td><div id="resetpw_form_passwd_errMsg"></div></td>                 
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="password" placeholder="&#9919; Confirma contrase&ntilde;a"  name="resetpw_form_passwd2" id="resetpw_form_passwd2" class="resetpw_form_class"/></td>
+                            <td><div id="resetpw_form_passwd2_errMsg"></div></td>                 
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align:right;">
+                                <input type="button" name="resetpw_form_submitlogin" id="resetpw_form_submitlogin" class="resetpw_form_form_submitlogin" value="Recuperar" 
+                                       onClick="var user_err_tag = 'resetpw_form_user_errMsg';
+                                               var user_value = document.getElementById('resetpw_form_user').value;
+                                               var passwd_err_tag = 'resetpw_form_passwd_errMsg';
+                                               var passwd_value = document.getElementById('resetpw_form_passwd').value;
+																							 var encryptOldPasswd = encryptAES(passwd_value);
+                                               var passwd2_err_tag = 'resetpw_form_passwd2_errMsg';
+                                               var passwd2_value = document.getElementById('resetpw_form_passwd2').value;
+																							 var encryptNewPasswd = encryptAES(passwd2_value);
+                                               var allOK = true;
+                                               clearDivFields(user_err_tag, passwd_err_tag, passwd2_err_tag);
+                                               /* 1. First make form validations */
+                                               if (validateNotNull(user_err_tag, user_value, passwd_err_tag, passwd_value, passwd2_err_tag, passwd2_value)) {
+                                                   if (validatePassword(passwd_value) && validatePassword(passwd2_value)) {
+                                                       if (validateEqualPasswords(passwd_value, passwd2_value)) {
+
+                                                           resp = validateUserGenQRAndNewPasswd(user_value, encryptOldPasswd, encryptNewPasswd, 'changepasswd');
+                                                           if (resp == _SUCCESS) {
+                                                               msg = _REG_SEND_EMAIL_UPDATE;
+                                                               allOK = true;
+                                                           } else {
+                                                               respStr = '' + resp;
+                                                               msg = errSystemOwn[respStr];
+                                                               allOK = false;
+                                                           }
+
+                                                           alert(msg);
+                                                           utils_show_message_in_div('resetpw_form_result', msg);
+                                                           if (allOK == true) {
+                                                               alert(_WAITING_FOR_UPDATE);
+                                                               waitForFinishOp(user_value, 'changepasswd', '1', handlerEventAfter, 'wait_form_result', _OP_UPDATE_SUCCESS, 'signin.html');
+                                                               resp2 = operationsUserOwncloud(user_value, encryptNewPasswd, 'changepasswd');
+                                                               if (resp2 == 0) {
+                                                                   utils_show_message_in_div('wait_form_result', _WAITING_FOR_UPDATE);
+                                                               } else {
+                                                                   respStr2 = '' + resp2;
+                                                                   msg2 = errSystemOwn[respStr2];
+                                                                   allOK = false;
+                                                               }
+                                                           }
+                                                       }
+                                                   }
+                                               }"/>
+                            </td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+
+        </form>
+        <div id="resetpw_form_result"><!-- Ajax response --></div>
+        <div id="wait_form_result"><!-- Ajax response --></div>
+    </body>
+</html>
